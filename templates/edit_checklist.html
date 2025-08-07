@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Checklist - GMList{% endblock %}
+
+{% block content %}
+<div class="brand-logo">
+    <h1><i class="fas fa-edit me-2"></i>Edit Checklist</h1>
+    <p>Update your checklist details</p>
+</div>
+
+<form method="POST" id="editForm">
+    <div class="form-group">
+        <i class="fas fa-heading input-icon"></i>
+        <input type="text" class="form-control" id="title" name="title" placeholder="Enter checklist title" value="{{ checklist[1] }}" required minlength="3">
+    </div>
+    
+    <div class="form-group">
+        <i class="fas fa-align-left input-icon"></i>
+        <textarea class="form-control" id="description" name="description" placeholder="Add a description (optional)" rows="4" style="padding-left: 50px;">{{ checklist[2] or '' }}</textarea>
+    </div>
+    
+    <button type="submit" class="btn btn-primary">
+        <i class="fas fa-save me-2"></i>Update Checklist
+    </button>
+</form>
+
+<div class="switch-form">
+    <p class="mb-0">
+        <a href="{{ url_for('view_checklist', checklist_id=checklist[0]) }}" class="fw-bold">
+            <i class="fas fa-arrow-left me-1"></i>Back to Checklist
+        </a>
+    </p>
+</div>
+
+<script>
+document.getElementById('editForm').addEventListener('submit', function(e) {
+    const button = this.querySelector('button[type="submit"]');
+    const originalText = button.innerHTML;
+    
+    button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Updating...';
+    button.disabled = true;
+    
+    // Re-enable button after form submission (in case of validation errors)
+    setTimeout(() => {
+        button.innerHTML = originalText;
+        button.disabled = false;
+    }, 3000);
+});
+</script>
+{% endblock %}

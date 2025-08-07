@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+
+{% block title %}Sign Up - GMList{% endblock %}
+
+{% block content %}
+<div class="brand-logo">
+    <h1><i class="fas fa-clipboard-list me-2"></i>GMList</h1>
+    <p>Join the Smart Checklist Revolution</p>
+</div>
+
+<form method="POST" id="signupForm">
+    <div class="form-group">
+        <i class="fas fa-user input-icon"></i>
+        <input type="text" class="form-control" id="name" name="name" placeholder="Enter your full name" required minlength="2">
+    </div>
+    
+    <div class="form-group">
+        <i class="fas fa-envelope input-icon"></i>
+        <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" required>
+    </div>
+    
+    <div class="form-group">
+        <i class="fas fa-lock input-icon"></i>
+        <input type="password" class="form-control" id="password" name="password" placeholder="Create a password" required minlength="6">
+        <div class="password-strength" id="passwordStrength"></div>
+    </div>
+    
+    <div class="form-group">
+        <i class="fas fa-check-circle input-icon"></i>
+        <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password" required>
+        <div class="password-match" id="passwordMatch"></div>
+    </div>
+    
+    <button type="submit" class="btn btn-primary">
+        <i class="fas fa-user-plus me-2"></i>Create Account
+    </button>
+</form>
+
+<div class="switch-form">
+    <p class="mb-0">Already have an account? 
+        <a href="{{ url_for('login') }}" class="fw-bold">Sign in here</a>
+    </p>
+</div>
+
+<style>
+.password-strength, .password-match {
+    font-size: 12px;
+    margin-top: 5px;
+    padding-left: 50px;
+    transition: all 0.3s ease;
+}
+
+.strength-weak { color: #dc3545; }
+.strength-medium { color: #ffc107; }
+.strength-strong { color: #28a745; }
+.match-error { color: #dc3545; }
+.match-success { color: #28a745; }
+
+.form-group {
+    animation-fill-mode: both;
+}
+
+.shake {
+    animation: shake 0.5s;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+</style>
+
+<script>
+const password = document.getElementById('password');
+const confirmPassword = document.getElementById('confirmPassword');
+const passwordStrength = document.getElementById('passwordStrength');
+const passwordMatch = document.getElementById('passwordMatch');
+const form = document.getElementById('signupForm');
+
+// Password strength checker
+password.addEventListener('input', function() {
+    const value = this.value;
+    const strength = checkPasswordStrength(value);
+    
+    passwordStrength.className = 'password-strength';
+    
+    if (value.length === 0) {
+        passwordStrength.textContent = '';
+        return;
+    }
+    
+    if (strength.score < 2) {
+        passwordStrength.classList.add('strength-weak');
+        passwordStrength.innerHTML = '<i class="fas fa-times-circle me-1"></i>Weak password';
+    } else if (strength.score < 4) {
+        passwordStrength.classList.add('strength-medium');
+        passwordStrength.innerHTML = '<i class="fas fa-exclamation-circle me-1"></i>Medium strength';
+    } else {
+        passwordStrength.classList.add('strength-strong');
+        passwordStrength.innerHTML = '<i class="fas fa-check-circle me-1"></i>Strong password';
+    }
+});
+
+// Password confirmation checker
+confirmPassword.addEventListener('input', function() {
+    const value = this.value;
+    const passwordValue = password.value;
+    
+    passwordMatch.className = 'password-match';
+    
+    if (value.length === 0) {
+        passwordMatch.textContent = '';
+        return;
+    }
+    
+    if (value === passwordValue) {
+        passwordMatch.classList.add('match-success');
+        passwordMatch.innerHTML = '<i class="fas fa-check-circle me-1"></i>Passwords match';
+    } else {
+        passwordMatch.classList.add('match-error');
+        passwordMatch.innerHTML = '<i class="fas fa-times-circle me-1"></i>Passwords do not match';
+    }
+});
+
+// Form validation
+form.addEventListener('submit', function(e) {
+    const passwordValue = password.value;
+    const confirmPasswordValue = confirmPassword.value;
+    const button = this.querySelector('button[type="submit"]');
+    
+    // Check if passwords match
+    if (passwordValue !== confirmPasswordValue) {
+        e.preventDefault();
+        confirmPassword.parentElement.classList.add('shake');
+        setTimeout(() => {
+            confirmPassword.parentElement.classList.remove('shake');
+        }, 500);
+        return;
+    }
+    
+    // Check password strength
+    const strength = checkPasswordStrength(passwordValue);
+    if (strength.score < 2) {
+        e.preventDefault();
+        password.parentElement.classList.add('shake');
+        setTimeout(() => {
+            password.parentElement.classList.remove('shake');
+        }, 500);
+        return;
+    }
+    
+    // Show loading state
+    const originalText = button.innerHTML;
+    button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Creating Account...';
+    button.disabled = true;
+    
+    // Re-enable button after form submission (in case of validation errors)
+    setTimeout(() => {
+        button.innerHTML = originalText;
+        button.disabled = false;
+    }, 3000);
+});
+
+function checkPasswordStrength(password) {
+    let score = 0;
+    
+    // Length check
+    if (password.length >= 8) score++;
+    if (password.length >= 12) score++;
+    
+    // Character variety checks
+    if (/[a-z]/.test(password)) score++;
+    if (/[A-Z]/.test(password)) score++;
+    if (/[0-9]/.test(password)) score++;
+    if (/[^A-Za-z0-9]/.test(password)) score++;
+    
+    return { score: score };
+}
+
+// Add real-time form validation styling
+document.querySelectorAll('input[required]').forEach(input => {
+    input.addEventListener('blur', function() {
+        if (this.value.trim() === '') {
+            this.style.borderColor = '#dc3545';
+        } else {
+            this.style.borderColor = '#28a745';
+        }
+    });
+    
+    input.addEventListener('input', function() {
+        if (this.style.borderColor === '#dc3545' && this.value.trim() !== '') {
+            this.style.borderColor = '#e1e5f2';
+        }
+    });
+});
+</script>
+{% endblock %}

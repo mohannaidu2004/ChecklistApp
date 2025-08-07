@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Create Checklist - GMList{% endblock %}
+
+{% block content %}
+<div class="brand-logo">
+    <h1><i class="fas fa-plus-circle me-2"></i>Create New Checklist</h1>
+    <p>Organize your tasks and stay productive</p>
+</div>
+
+<form method="POST" id="createForm">
+    <div class="form-group">
+        <i class="fas fa-heading input-icon"></i>
+        <input type="text" class="form-control" id="title" name="title" placeholder="Enter checklist title" required minlength="3">
+    </div>
+    
+    <div class="form-group">
+        <i class="fas fa-align-left input-icon"></i>
+        <textarea class="form-control" id="description" name="description" placeholder="Add a description (optional)" rows="4" style="padding-left: 50px;"></textarea>
+    </div>
+    
+    <button type="submit" class="btn btn-primary">
+        <i class="fas fa-save me-2"></i>Create Checklist
+    </button>
+</form>
+
+<div class="switch-form">
+    <p class="mb-0">
+        <a href="{{ url_for('dashboard') }}" class="fw-bold">
+            <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+        </a>
+    </p>
+</div>
+
+<script>
+document.getElementById('createForm').addEventListener('submit', function(e) {
+    const button = this.querySelector('button[type="submit"]');
+    const originalText = button.innerHTML;
+    
+    button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Creating...';
+    button.disabled = true;
+    
+    // Re-enable button after form submission (in case of validation errors)
+    setTimeout(() => {
+        button.innerHTML = originalText;
+        button.disabled = false;
+    }, 3000);
+});
+</script>
+{% endblock %}
