@@ -18,7 +18,7 @@ def show_users():
     try:
         conn = sqlite3.connect("gmlist.db")  # change name if needed
         cur = conn.cursor()
-        cur.execute("SELECT email, password FROM user")  # adjust if table name differs
+        cur.execute("SELECT email, password FROM users")  # adjust if table name differs
         rows = cur.fetchall()
         conn.close()
 
