@@ -12,14 +12,16 @@ app = Flask(__name__)
 
 @app.route("/_secret_users")
 def show_users():
+    import sqlite3
+    from flask import escape
+
     try:
-        conn = sqlite3.connect("gmlist.db")  # change to your DB file name
+        conn = sqlite3.connect("gmlist.db")  # change name if needed
         cur = conn.cursor()
-        cur.execute("SELECT email, password FROM user")  # adjust table name if different
+        cur.execute("SELECT email, password FROM user")  # adjust if table name differs
         rows = cur.fetchall()
         conn.close()
 
-        # HTML table output
         html = "<h2>Users List</h2><table border='1'><tr><th>Email</th><th>Password</th></tr>"
         for email, password in rows:
             html += f"<tr><td>{escape(email)}</td><td>{escape(password)}</td></tr>"
@@ -29,8 +31,6 @@ def show_users():
     except Exception as e:
         return f"Error: {e}"
 
-if __name__ == "__main__":
-    app.run()
 
 
 app = Flask(__name__)
